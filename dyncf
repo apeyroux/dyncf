@@ -36,31 +36,32 @@ if __name__ == "__main__":
     except Exception as ex:
         print("Oops: %s" % ex)
     else:
-        for entry in resp_getdns['response']['recs']['objs']:
-            if entry['name'] == dyndns:
-                name = entry['name']
-                ipcf = entry['content']
-                iploc = myip()
-                if iploc != ipcf:
-                    print("Diff d'ip (loc:%s cf:%s dns:%s)" % (iploc, ipcf, name))
-                    print("Demande de changement auprès de cf ...")
-                    iddnsrecord = entry['rec_id']
-                    try:
-                        resp_updns = cfrequest(CF_EMAIL, CF_API_KEY, 'rec_edit',
-                                               id=iddnsrecord,
-                                               z=zone,
-                                               type='A',
-                                               name=dyndns.split('.')[0],
-                                               content=iploc,
-                                               service_mode=0,
-                                               ttl=1)
-                    except Exception as ex:
-                        print('Oops: %s' % ex)
-                        sys.exit(1)
-                    else:
-                        if resp_getdns['result'] == "success":
-                            print("Modification ok")
-                            sys.exit(0)
-                        else:
-                            print("%s: %s" % (resp_updns['result'], resp_updns['msg']))
+        if 'response' in resp_getdns.keys() :
+            for entry in resp_getdns['response']['recs']['objs']:
+                if entry['name'] == dyndns:
+                    name = entry['name']
+                    ipcf = entry['content']
+                    iploc = myip()
+                    if iploc != ipcf:
+                        print("Diff d'ip (loc:%s cf:%s dns:%s)" % (iploc, ipcf, name))
+                        print("Demande de changement auprès de cf ...")
+                        iddnsrecord = entry['rec_id']
+                        try:
+                            resp_updns = cfrequest(CF_EMAIL, CF_API_KEY, 'rec_edit',
+                                                   id=iddnsrecord,
+                                                   z=zone,
+                                                   type='A',
+                                                   name=dyndns.split('.')[0],
+                                                   content=iploc,
+                                                   service_mode=0,
+                                                   ttl=1)
+                        except Exception as ex:
+                            print('Oops: %s' % ex)
                             sys.exit(1)
+                        else:
+                            if resp_getdns['result'] == "success":
+                                print("Modification ok")
+                                sys.exit(0)
+                            else:
+                                print("%s: %s" % (resp_updns['result'], resp_updns['msg']))
+                                sys.exit(1)
